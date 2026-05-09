@@ -1,10 +1,10 @@
-import { PrismaAdapter } from "@auth/prisma-adapter"
+import { PrismaAdapter } from '@auth/prisma-adapter';
 import bcrypt from 'bcryptjs';
-import NextAuth from 'next-auth';
+import NextAuth, { type AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { prisma } from './prisma';
+import { prisma } from './db';
 
-export const authOptions = {
+export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'database'
@@ -17,22 +17,16 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
+        if (!credentials?.email || !credentials?.password) return null;
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email }
         });
 
-        if (!user) {
-          return null;
-        }
+        if (!user) return null;
 
-        const isValid = await bcrypt.compare(credentials.password as string, user.password);
-        if (!isValid) {
-          return null;
-        }
+        const isValid = await bcrypt.compare(credentials.password, user.password);
+        if (!isValid) return null;
 
         return {
           id: user.id,
@@ -45,15 +39,17 @@ export const authOptions = {
   ],
   callbacks: {
     session: async ({ session, token }) => {
-      if (session.user && token) {
-        session.user.id = token.sub;
-        session.user.role = token.role as string;
+      if (session?.user) {
+        const user = session.user as { id?: string; role?: string };
+        user.id = token.sub ?? user.id;
+        user.role = (token.role as string) ?? user.role;
+        session.user = user;
       }
       return session;
     },
-    jwt: async ({ token, user }: {token: string}) => {
+    jwt: async ({ token, user }) => {
       if (user) {
-        token.role = user.role;
+        token.role = (user as { role?: string }).role ?? token.role;
       }
       return token;
     }

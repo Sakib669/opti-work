@@ -1,5 +1,34 @@
 import Link from 'next/link';
+import type { LucideIcon } from 'lucide-react';
 import { ArrowRight, LayoutDashboard, Tool, Users } from 'lucide-react';
+
+interface NavCard {
+  label: string;
+  description: string;
+  href: string;
+  Icon: LucideIcon;
+}
+
+const navItems: NavCard[] = [
+  {
+    label: 'Dashboard',
+    description: 'Review productivity metrics, active orders, and workstation status.',
+    href: '/dashboard',
+    Icon: LayoutDashboard
+  },
+  {
+    label: 'Workstations',
+    description: 'Manage station assignments, availability, and health.',
+    href: '/workstations',
+    Icon: Tool
+  },
+  {
+    label: 'Tasks',
+    description: 'Create orders, assign staff, and update task progress.',
+    href: '/tasks',
+    Icon: Users
+  }
+];
 
 export default function HomePage() {
   return (
@@ -7,35 +36,40 @@ export default function HomePage() {
       <div className="mx-auto max-w-6xl rounded-3xl border border-slate-800/60 bg-slate-950/70 p-10 shadow-glow backdrop-blur">
         <div className="mb-10 space-y-4">
           <p className="text-sm uppercase tracking-[0.35em] text-sky-400">OptiWork MVP</p>
-          <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">Manufacturing Productivity Dashboard</h1>
+          <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+            Manufacturing productivity, order flow, and role-based operations
+          </h1>
           <p className="max-w-3xl text-slate-300 sm:text-lg">
-            Track workstations, manage orders, and deliver a secure role-based workflow for admins and staff.
+            Track workstations, manage orders, and deliver secure role-based access for admins and staff.
           </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
-            { label: 'Workstations', icon: Tool, href: '/workstations' },
-            { label: 'Tasks', icon: Users, href: '/tasks' }
-          ].map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="group rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 transition hover:border-sky-400/20 hover:bg-slate-900"
-            >
-              <div className="flex items-center gap-4">
-                <item.icon className="h-8 w-8 text-sky-400 transition group-hover:text-white" />
-                <div>
-                  <p className="text-lg font-semibold text-white">{item.label}</p>
-                  <p className="text-sm text-slate-400">Manage {item.label.toLowerCase()} and assignments.</p>
+          {navItems.map((item) => {
+            const label = item?.label ?? 'Section';
+            const description = item?.description ?? 'Open this section';
+            const href = item?.href ?? '/';
+            const Icon = item?.Icon ?? LayoutDashboard;
+
+            return (
+              <Link
+                key={href}
+                href={href}
+                className="group rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 transition hover:border-sky-400/20 hover:bg-slate-900"
+              >
+                <div className="flex items-center gap-4">
+                  <Icon className="h-8 w-8 text-sky-400 transition group-hover:text-white" />
+                  <div>
+                    <p className="text-lg font-semibold text-white">{label}</p>
+                    <p className="text-sm text-slate-400">{description}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-5 flex items-center gap-2 text-sm text-slate-400">
-                View section <ArrowRight className="h-4 w-4 text-slate-500" />
-              </div>
-            </Link>
-          ))}
+                <div className="mt-5 flex items-center gap-2 text-sm text-slate-400">
+                  View section <ArrowRight className="h-4 w-4 text-slate-500" />
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </main>
