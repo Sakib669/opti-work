@@ -8,12 +8,12 @@ interface UserData {
   image?: string
 }
 
-interface DashboardProps {
-  user?: UserData
-}
+import { prisma } from '@/lib/db'
 
-export default function Dashboard({ user }: DashboardProps) {
-  // Anti-crash logic with optional chaining and nullish coalescing
+export default async function Dashboard() {
+  // For demonstration: fetching the first user.
+  // In a real app, you would use auth() from next-auth to get the session user ID.
+  const user = await prisma.user.findFirst()
   const displayName = user?.name ?? 'Guest'
   const email = user?.email ?? 'No email'
 
